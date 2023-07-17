@@ -7,15 +7,16 @@
 ;; Copyright (C) 2018, Andy Stewart, all rights reserved.
 ;; Created: 2018-09-22 10:54:16
 ;; Version: 2.4
-;; Last-Updated: 2020-03-22 22:48:58
-;;           By: Andy Stewart
+;; Package-Requires: ((emacs "24.4"))
+;; Last-Updated: 2023-07-17 17:01:58
+;;           By: Mike Chen
 ;; URL: http://www.emacswiki.org/emacs/download/insert-translated-name.el
-;; Keywords:
+;; Keywords: tools translate
 ;; Compatibility: GNU Emacs 27.0.50
 ;;
 ;; Features that might be required by this library:
 ;;
-;; `json' `subr-x'
+;; `json' `cl-lib'
 ;;
 
 ;;; This file is NOT part of GNU Emacs
@@ -65,6 +66,11 @@
 ;;
 
 ;;; Change log:
+;;
+;; 2023/07/17
+;;      * Add `cl-lib' depend.
+;;      * Delete `subr-x' depend.
+;;      * Update google api access url
 ;;
 ;; 2020/03/22
 ;;      * Use `default-input-method' instead pyim method.
@@ -138,7 +144,7 @@
 
 ;;; Require
 (require 'json)
-(require 'subr-x)
+(require 'cl-lib)
 
 ;;; Code:
 
@@ -298,7 +304,7 @@
   (unless keep-style
     (set (make-local-variable 'insert-translated-name-active-style) nil)))
 
-(defun insert-translated-name-monitor-after-change (start end len)
+(defun insert-translated-name-monitor-after-change (start end _len)
   (when (and (boundp 'insert-translated-name-active-point))
     (if insert-translated-name-active-point
         (let ((translate-start insert-translated-name-active-point)
@@ -391,8 +397,7 @@
       (puthash placeholder (point) insert-translated-name-placeholder-hash)
 
       ;; Query translation.
-      (insert-translated-name-retrieve-translation word style placeholder)
-      )))
+      (insert-translated-name-retrieve-translation word style placeholder))))
 
 (defun insert-translated-name-retrieve-translation (word style placeholder)
   (cond ((string-equal insert-translated-name-translate-engine "youdao")
@@ -404,12 +409,11 @@
          (url-retrieve
           (insert-translated-name-google-build-url word)
           'insert-translated-name-google-retrieve-callback
-          (list word style (current-buffer) placeholder)))
-        ))
+          (list word style (current-buffer) placeholder)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;; Google API ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defconst insert-translated-name-google-api-url
-  "http://translate.google.cn/translate_a/single")
+  "https://translate.googleapis.com/translate_a/single")
 
 (defconst insert-translated-name-google-translate-bit-v-len 32)
 
