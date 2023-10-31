@@ -455,7 +455,7 @@
                     (start-process
                      "insert-translated-name"
                      " *insert-translated-name*"
-                     "python"
+                     "python3"
                      insert-translated-name-ollama-file
                      insert-translated-name-ollama-model-name
                      (format "'%s'" word)
